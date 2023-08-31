@@ -8,6 +8,12 @@ dependencies:
   expo:
     specifier: ~49.0.8
     version: 49.0.8(@babel/core@7.20.2)
+  expo-camera:
+    specifier: ~13.4.2
+    version: 13.4.2(expo@49.0.8)(react@18.2.0)
+  expo-splash-screen:
+    specifier: ~0.20.5
+    version: 0.20.5(expo-modules-autolinking@1.5.1)(expo@49.0.8)
   expo-status-bar:
     specifier: ~1.6.0
     version: 1.6.0
@@ -1951,6 +1957,15 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
+  /@koale/useworker@4.0.2(react@18.2.0):
+    resolution: {integrity: sha512-xPIPADtom8/3/4FLNj7MvNcBM/Z2FleH85Fdx2O869eoKW8+PoEgtSVvoxWjCWMA46Sm9A5/R1TyzNGc+yM0wg==}
+    peerDependencies:
+      react: ^16.8.0
+    dependencies:
+      dequal: 1.0.1
+      react: 18.2.0
+    dev: false
+
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -3267,6 +3282,11 @@ packages:
       prop-types: 15.8.1
     dev: false
 
+  /dequal@1.0.1:
+    resolution: {integrity: sha512-Fx8jxibzkJX2aJgyfSdLhr9tlRoTnHKrRJuu2XHlAgKioN2j19/Bcbe0d4mFXYZ3+wpE2KVobUVTfDutcD17xQ==}
+    engines: {node: '>=6'}
+    dev: false
+
   /destroy@1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
@@ -3451,6 +3471,18 @@ packages:
       - supports-color
     dev: false
 
+  /expo-camera@13.4.2(expo@49.0.8)(react@18.2.0):
+    resolution: {integrity: sha512-3G4ahx0pF56PyYixFlU39jrZof6I9XtBzizGObKN6ZKjSgCqqL0tjsrlDrCn44ZwSY4SngsMJmWR9JQDkKx2WA==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      '@koale/useworker': 4.0.2(react@18.2.0)
+      expo: 49.0.8(@babel/core@7.20.2)
+      invariant: 2.2.4
+    transitivePeerDependencies:
+      - react
+    dev: false
+
   /expo-constants@14.4.2(expo@49.0.8):
     resolution: {integrity: sha512-nOB122DOAjk+KrJT69lFQAoYVQGQjFHSigCPVBzVdko9S1xGsfiOH9+X5dygTsZTIlVLpQJDdmZ7ONiv3i+26w==}
     peerDependencies:
@@ -3508,6 +3540,19 @@ packages:
     dependencies:
       compare-versions: 3.6.0
       invariant: 2.2.4
+    dev: false
+
+  /expo-splash-screen@0.20.5(expo-modules-autolinking@1.5.1)(expo@49.0.8):
+    resolution: {integrity: sha512-nTALYdjHpeEA30rdOWSguxn72ctv8WM8ptuUgpfRgsWyn4i6rwYds/rBXisX69XO5fg+XjHAQqijGx/b28+3tg==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      '@expo/prebuild-config': 6.2.6(expo-modules-autolinking@1.5.1)
+      expo: 49.0.8(@babel/core@7.20.2)
+    transitivePeerDependencies:
+      - encoding
+      - expo-modules-autolinking
+      - supports-color
     dev: false
 
   /expo-status-bar@1.6.0:
