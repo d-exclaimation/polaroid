@@ -1,5 +1,5 @@
 import { component } from "@/lib/rc";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 export default component(() => {
@@ -9,6 +9,12 @@ export default component(() => {
         name="index"
         options={{
           title: "Gallery",
+          tabBarLabelStyle: {
+            display: "none",
+          },
+          tabBarIcon: (props) => (
+            <MaterialIcons name="camera" size={24} color={props.color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -19,7 +25,19 @@ export default component(() => {
             display: "none",
           },
           tabBarIcon: (props) => (
-            <FontAwesome5 name="camera" size={24} color={props.color} />
+            <MaterialIcons name="photo-camera" size={24} color={props.color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: "Library",
+          tabBarLabelStyle: {
+            display: "none",
+          },
+          tabBarIcon: (props) => (
+            <MaterialIcons name="library-books" size={24} color={props.color} />
           ),
         }}
       />
@@ -27,6 +45,12 @@ export default component(() => {
         name="settings"
         options={{
           title: "Settings",
+          tabBarLabelStyle: {
+            display: "none",
+          },
+          tabBarIcon: (props) => (
+            <MaterialIcons name="settings" size={24} color={props.color} />
+          ),
         }}
       />
     </Tabs>

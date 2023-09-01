@@ -1,28 +1,17 @@
-import { usePhoto } from "@/lib/photo";
 import { component } from "@/lib/rc";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Camera, CameraType, ImageType } from "expo-camera";
+import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
 import { router } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 
-type Objects = {
-  name: string;
-  bbox: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
-};
-
 const DIMENSIONS = {
   width: 400,
-  height: 500,
+  height: 400,
 };
 
 export default component(() => {
-  const { setPhoto } = usePhoto();
   const camera = useRef<Camera>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -48,22 +37,32 @@ export default component(() => {
         onPress={async () => {
           if (!camera.current || !canTakePicture) return;
 
-          const res = await camera.current.takePictureAsync({
+          const { uri, width, height } = await camera.current.takePictureAsync({
             imageType: ImageType.jpg,
           });
-          console.log(res);
 
-          setPhoto({
-            uri: res.uri,
-            width: res.width,
-            height: res.height,
-          });
-          router.push({
-            pathname: "/result",
-          });
+          const resize =
+            width > height
+              ? { width: 400, height: Math.round((height / width) * 400) }
+              : { width: Math.round((width / height) * 400), height: 400 };
+
+          const image = await manipulateAsync(
+            uri,
+            [
+              {
+                resize,
+              },
+            ],
+            {
+              compress: 1,
+              format: SaveFormat.JPEG,
+            }
+          );
+
+          router.push(`/photo/${encodeURIComponent(image.uri)}`);
         }}
       >
-        <FontAwesome5 name="camera" size={32} color="black" />
+        <MaterialIcons name="center-focus-weak" size={32} color="black" />
       </Pressable>
     </View>
   );

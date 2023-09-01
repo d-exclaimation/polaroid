@@ -1,21 +1,18 @@
-import { PhotoProvider } from "@/lib/photo";
 import { component } from "@/lib/rc";
 import { Stack } from "expo-router";
 import { LogBox } from "react-native";
 
-LogBox.ignoreLogs([/.*webgl.*/]);
+LogBox.ignoreLogs([/.*webgl.*/, /.*tf.*/]);
 
 export default component(() => {
   return (
-    <PhotoProvider>
-      <Stack initialRouteName="(tabs)">
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
-        />
-      </Stack>
-    </PhotoProvider>
+    <Stack initialRouteName="(tabs)">
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack>
   );
 });
