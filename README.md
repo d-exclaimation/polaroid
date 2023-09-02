@@ -1,8 +1,8 @@
 <!-- <img src="packages/web/static/banner/welcome-sm.png"> -->
 
-# Polario
+# Polaroid
 
-[Polario](https://polario.d-exclaimation.me) is a way to start your day with some fun with photography challenges. Get a handful of photo challenges, take a photo that have all the things in the challenge, and share it with the community.
+[Polaroid](https://polaroid.d-exclaimation.me) is a way to start your day with some fun with photography challenges. Get a handful of photo challenges, take a photo that have all the things in the challenge, and share it with the community.
 
 <!-- <div>
 <img width="32%" src="packages/web/static/banner/glance.png">
@@ -20,12 +20,12 @@
 
 ## Community & Support
 
-- [GitHub Issues](https://github.com/d-exclaimation/polario-expo/issues). Best for: bugs and errors you encounter using [Polario](https://polario.d-exclaimation.me).
+- [GitHub Issues](https://github.com/d-exclaimation/polaroid-expo/issues). Best for: bugs and errors you encounter using [Polaroid](https://polaroid.d-exclaimation.me).
 - [Email Support](mailto:vincent@d-exclaimation.me). Best for: problems with your account.
 
 ## Status
  
-- [x] Alpha: We are testing Polario with a closed set of customers
+- [x] Alpha: We are testing Polaroid with a closed set of customers
 - [ ] Early access: Anyone can sign up to a waitlist and get early access, but most features are still being built
 - [ ] Public Beta: Available for everyone with stable feature set, but we are still working out kinks
 - [ ] Public: General Availability 
@@ -34,18 +34,18 @@ We are currently in Public Beta.
 
 ## License
 
-Polario is licensed under the [MPL-2.0](/LICENSE) license.
+Polaroid is licensed under the [MPL-2.0](/LICENSE) license.
 
 ## Acknowledgements
 
-Special thanks to these amazing projects which help power Polario:
+Special thanks to these amazing projects which help power Polaroid:
 
 - [Tensorflow](https://www.tensorflow.org/) for providing Coco-SSD model
 
 <!-- <br/>
 
 Have fun reading,<br/>
-Friends at Polario
+Friends at Polaroid
   
 <img width="8%" src="packages/web/static/spotlight.png"> 
 

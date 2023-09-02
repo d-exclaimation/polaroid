@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "polario",
-    "slug": "polario",
+    "name": "polaroid",
+    "slug": "polaroid",
     "version": "1.0.0",
     "jsEngine": "jsc",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "polario",
+    "scheme": "polaroid",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "me.d-exclaimation.polario"
+      "bundleIdentifier": "me.d-exclaimation.polaroid"
     },
     "android": {
       "adaptiveIcon": {

@@ -9,6 +9,7 @@ export default component(() => {
         name="index"
         options={{
           title: "Gallery",
+          headerShown: false,
           tabBarLabelStyle: {
             display: "none",
           },
@@ -21,6 +22,7 @@ export default component(() => {
         name="snap"
         options={{
           title: "Snaps",
+          headerShown: false,
           tabBarLabelStyle: {
             display: "none",
           },
@@ -33,6 +35,7 @@ export default component(() => {
         name="library"
         options={{
           title: "Library",
+          headerShown: false,
           tabBarLabelStyle: {
             display: "none",
           },
