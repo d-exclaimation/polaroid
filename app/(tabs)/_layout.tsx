@@ -8,7 +8,7 @@ export default component(() => {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Gallery",
+          title: "Snaps",
           headerShown: false,
           tabBarLabelStyle: {
             display: "none",
@@ -19,9 +19,9 @@ export default component(() => {
         }}
       />
       <Tabs.Screen
-        name="snap"
+        name="capture"
         options={{
-          title: "Snaps",
+          title: "Capture",
           headerShown: false,
           tabBarLabelStyle: {
             display: "none",

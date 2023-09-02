@@ -6,7 +6,13 @@ import { decodeJpeg, fetch } from "@tensorflow/tfjs-react-native";
 import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
 import { useCallback, useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type PhotoAsset = {
   uri: string;
@@ -16,6 +22,10 @@ type PhotoAsset = {
 type DetectedObject = {
   name: string;
   bbox: { x: number; y: number; width: number; height: number };
+};
+const DIMENSIONS = {
+  width: 350,
+  height: 350,
 };
 
 export default component(() => {
@@ -48,7 +58,7 @@ export default component(() => {
   }, [tfReady]);
 
   return (
-    <View className="flex-1 flex items-center justify-center gap-10">
+    <SafeAreaView className="flex-1 flex items-center justify-center gap-10">
       {!image ? (
         <View className="flex w-[400px] h-[400px] items-center justify-center border border-dashed border-neutral-400">
           <TouchableOpacity
@@ -84,30 +94,37 @@ export default component(() => {
           </TouchableOpacity>
         </View>
       ) : (
-        <View className="w-[400px] h-[400px] relative">
-          <Image className="w-[400px] h-[400px]" source={{ uri: image.uri }} />
-          <TouchableOpacity
-            className="absolute top-4 right-4 p-1 rounded-full bg-black"
-            onPress={() => {
-              setImage(undefined);
-            }}
-          >
-            <MaterialIcons name="close" size={20} color={"#ffffff"} />
-          </TouchableOpacity>
-          {detectedObjects.map(({ name, bbox: { x, y, width, height } }, i) => {
-            return (
-              <View
-                key={`${name}-${i}`}
-                className="border border-indigo-500 absolute"
-                style={{
-                  left: (x / image.width) * 400,
-                  top: (y / image.height) * 400,
-                  width: (width / image.width) * 400,
-                  height: (height / image.height) * 400,
-                }}
-              />
-            );
-          })}
+        <View className="h-[400px] w-[375px] bg-white relative flex flex-col items-center justify-start py-3">
+          <View className="w-[350px] h-[350px] relative">
+            <Image
+              className="w-[350px] h-[350px]"
+              source={{ uri: image.uri }}
+            />
+            <TouchableOpacity
+              className="absolute top-2 right-2 p-1 rounded-full bg-black"
+              onPress={() => {
+                setImage(undefined);
+              }}
+            >
+              <MaterialIcons name="close" size={20} color={"#ffffff"} />
+            </TouchableOpacity>
+            {detectedObjects.map(
+              ({ name, bbox: { x, y, width, height } }, i) => {
+                return (
+                  <View
+                    key={`${name}-${i}`}
+                    className="border border-indigo-500 absolute"
+                    style={{
+                      left: (x / image.width) * DIMENSIONS.width,
+                      top: (y / image.height) * DIMENSIONS.height,
+                      width: (width / image.width) * DIMENSIONS.width,
+                      height: (height / image.height) * DIMENSIONS.height,
+                    }}
+                  />
+                );
+              }
+            )}
+          </View>
         </View>
       )}
 
@@ -116,15 +133,13 @@ export default component(() => {
         disabled={!tfReady || !image || loading}
         onPress={() => {
           setLoading(true);
-          classify()
-            .then(() => setLoading(false))
-            .catch(console.error);
+          classify().finally(() => setLoading(false));
         }}
       >
         <Text className="text-black font-medium">
           {tfReady && image && !loading ? "Detect" : "Loading..."}
         </Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 });

@@ -1,10 +1,10 @@
 import { component } from "@/lib/rc";
-import { Text, View } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 
 export default component(() => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>Settings</Text>
-    </View>
+    </SafeAreaView>
   );
 });
