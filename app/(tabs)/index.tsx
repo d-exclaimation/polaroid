@@ -80,13 +80,13 @@ export default component(() => {
           width: maxWidth,
           alignItems: "center",
         }}
-        renderItem={({ item: { image, kind, createdAt } }) => {
+        renderItem={({ item: { photo, kind, createdAt } }) => {
           return (
             <View className="p-3">
-              <View className="w-[400px] h-[400px] relative overflow-hidden rounded-2xl">
+              <View className="w-[375px] h-[375px] relative overflow-hidden rounded-2xl">
                 <Image
-                  className="w-[400px] h-[400px] bg-black"
-                  source={image}
+                  className="w-[375px] h-[375px] bg-black"
+                  source={photo}
                 />
               </View>
 

@@ -1,3 +1,4 @@
+import TensorflowProvider from "@/lib/context/tensorflow-provider";
 import { component } from "@/lib/rc";
 import { ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -11,28 +12,36 @@ const queryClient = new QueryClient();
 export default component(() => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        value={{
-          dark: true,
-          colors: {
-            primary: "#FFFFFF",
-            background: "#464C67",
-            card: "#262C47",
-            text: "#FFFFFF",
-            border: "#484E69",
-            notification: "#FFFFFF",
-          },
-        }}
-      >
-        <Stack initialRouteName="(tabs)">
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Stack>
-      </ThemeProvider>
+      <TensorflowProvider>
+        <ThemeProvider
+          value={{
+            dark: true,
+            colors: {
+              primary: "#FFFFFF",
+              background: "#464C67",
+              card: "#262C47",
+              text: "#FFFFFF",
+              border: "#484E69",
+              notification: "#FFFFFF",
+            },
+          }}
+        >
+          <Stack initialRouteName="(tabs)">
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="captured"
+              options={{
+                presentation: "modal",
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </TensorflowProvider>
     </QueryClientProvider>
   );
 });

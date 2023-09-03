@@ -1,10 +1,17 @@
 import { component } from "@/lib/rc";
-import { SafeAreaView, Text } from "react-native";
+import { Link } from "expo-router";
+import { SafeAreaView } from "react-native";
 
 export default component(() => {
   return (
     <SafeAreaView>
-      <Text>Settings</Text>
+      <Link
+        href={{
+          pathname: "/captured",
+        }}
+      >
+        Settings
+      </Link>
     </SafeAreaView>
   );
 });

@@ -4,13 +4,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Camera, CameraType, ImageType } from "expo-camera";
 import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
 import { router } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, SafeAreaView, View } from "react-native";
-
-const DIMENSIONS = {
-  width: 400,
-  height: 400,
-};
 
 export default component(() => {
   const camera = useRef<Camera>(null);
@@ -39,8 +34,21 @@ export default component(() => {
       format: SaveFormat.JPEG,
     });
 
-    router.push(`/photo/${encodeURIComponent(image.uri)}`);
+    router.push({
+      pathname: "/captured",
+      params: {
+        uri: image.uri,
+        width: image.width,
+        height: image.height,
+      },
+    });
   }, [canTakePicture, takingPicture]);
+
+  useEffect(() => {
+    if (permission && !permission.granted) {
+      requestPermission();
+    }
+  }, [permission]);
 
   return (
     <SafeAreaView className="flex-1 flex items-center justify-center gap-12 bg-black">
@@ -48,8 +56,6 @@ export default component(() => {
         <Camera
           ref={camera}
           className="w-[400px] h-[400px]"
-          ratio="1:1"
-          pictureSize="1:1"
           type={CameraType.back}
           onCameraReady={() => setCameraReady(true)}
         />

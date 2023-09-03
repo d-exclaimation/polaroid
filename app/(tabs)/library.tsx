@@ -1,13 +1,12 @@
 import { component } from "@/lib/rc";
 import { MaterialIcons } from "@expo/vector-icons";
-import * as cocossd from "@tensorflow-models/coco-ssd";
-import * as tf from "@tensorflow/tfjs";
-import { decodeJpeg, fetch } from "@tensorflow/tfjs-react-native";
 import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
 import { MediaTypeOptions, launchImageLibraryAsync } from "expo-image-picker";
-import { useCallback, useEffect, useState } from "react";
+import { router } from "expo-router";
+import { useState } from "react";
 import {
   Image,
+  Pressable,
   SafeAreaView,
   Text,
   TouchableOpacity,
@@ -30,32 +29,6 @@ const DIMENSIONS = {
 
 export default component(() => {
   const [image, setImage] = useState<PhotoAsset>();
-  const [tfReady, setTfReady] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [detectedObjects, setDetectedObjects] = useState<DetectedObject[]>([]);
-
-  const classify = useCallback(async () => {
-    if (!tfReady || !image) return;
-    const model = await cocossd.load();
-    const imageAsset = await fetch(image.uri, {}, { isBinary: true });
-    const imageBuffer = await imageAsset.arrayBuffer();
-    const imageTensor = decodeJpeg(new Uint8Array(imageBuffer), 3);
-    const detected = await model.detect(imageTensor);
-    setDetectedObjects(
-      detected.map(({ class: name, bbox: [x, y, width, height] }) => ({
-        name,
-        bbox: { x, y, width, height },
-      }))
-    );
-  }, [setDetectedObjects, tfReady, image]);
-
-  useEffect(() => {
-    if (tfReady) return;
-    (async () => {
-      await tf.ready();
-      setTfReady(true);
-    })();
-  }, [tfReady]);
 
   return (
     <SafeAreaView className="flex-1 flex items-center justify-center gap-10">
@@ -94,52 +67,43 @@ export default component(() => {
           </TouchableOpacity>
         </View>
       ) : (
-        <View className="h-[400px] w-[375px] bg-white relative flex flex-col items-center justify-start py-3">
-          <View className="w-[350px] h-[350px] relative">
-            <Image
-              className="w-[350px] h-[350px]"
-              source={{ uri: image.uri }}
-            />
-            <TouchableOpacity
-              className="absolute top-2 right-2 p-1 rounded-full bg-black"
-              onPress={() => {
-                setImage(undefined);
-              }}
-            >
-              <MaterialIcons name="close" size={20} color={"#ffffff"} />
-            </TouchableOpacity>
-            {detectedObjects.map(
-              ({ name, bbox: { x, y, width, height } }, i) => {
-                return (
-                  <View
-                    key={`${name}-${i}`}
-                    className="border border-indigo-500 absolute"
-                    style={{
-                      left: (x / image.width) * DIMENSIONS.width,
-                      top: (y / image.height) * DIMENSIONS.height,
-                      width: (width / image.width) * DIMENSIONS.width,
-                      height: (height / image.height) * DIMENSIONS.height,
-                    }}
-                  />
-                );
-              }
-            )}
+        <>
+          <View className="h-[450px] w-[375px] bg-white relative flex flex-col items-center justify-start py-3">
+            <View className="w-[350px] h-[350px] relative">
+              <Image
+                className="w-[350px] h-[350px]"
+                source={{ uri: image.uri }}
+              />
+              <TouchableOpacity
+                className="absolute top-2 right-2 p-1 rounded-full bg-black"
+                onPress={() => {
+                  setImage(undefined);
+                }}
+              >
+                <MaterialIcons name="close" size={20} color={"#ffffff"} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+          <Pressable
+            className="px-4 py-1.5 rounded-md flex flex-row items-center justify-center bg-black/25 active:bg-black/50 ml-4"
+            onPress={() => {
+              router.push({
+                pathname: "/captured",
+                params: {
+                  uri: image.uri,
+                  width: image.width,
+                  height: image.height,
+                },
+              });
+              setImage(undefined);
+            }}
+          >
+            <Text className="text-green-200 font-medium text-lg leading-7">
+              Select
+            </Text>
+          </Pressable>
+        </>
       )}
-
-      <TouchableOpacity
-        className="px-4 py-2 rounded-md bg-neutral-200"
-        disabled={!tfReady || !image || loading}
-        onPress={() => {
-          setLoading(true);
-          classify().finally(() => setLoading(false));
-        }}
-      >
-        <Text className="text-black font-medium">
-          {tfReady && image && !loading ? "Detect" : "Loading..."}
-        </Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 });
