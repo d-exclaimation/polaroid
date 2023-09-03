@@ -4,8 +4,6 @@ import * as tf from "@tensorflow/tfjs";
 import { ReactNode, createContext } from "react";
 import { component } from "../rc";
 
-type TensorflowModels = {};
-
 type TensorflowContextValue = {
   tfReady: boolean;
   cocossd: () => Promise<cocossd.ObjectDetection>;
@@ -30,7 +28,7 @@ export default component<{ children: ReactNode }>(({ children }) => {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  const { data: cocossdModel, refetch: loadModel } = useQuery({
+  const { data: cocossdModel, refetch: loadCocossd } = useQuery({
     queryKey: ["tensorflow", "cocossd"],
     queryFn: async () => {
       const model = await cocossd.load();
@@ -54,7 +52,7 @@ export default component<{ children: ReactNode }>(({ children }) => {
           if (cocossdModel) {
             return cocossdModel;
           }
-          const res = await loadModel();
+          const res = await loadCocossd();
           if (res.isError) throw res.error;
           return res.data!;
         },
