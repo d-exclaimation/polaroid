@@ -1,25 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
 import * as cocossd from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs";
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, createContext } from "react";
 import { component } from "../rc";
 
-type TensorflowModels = {
-  cocossd?: cocossd.ObjectDetection;
-};
+type TensorflowModels = {};
 
 type TensorflowContextValue = {
   tfReady: boolean;
-  models: TensorflowModels;
-  setModel: <K extends keyof TensorflowModels>(
-    kind: K,
-    model: TensorflowModels[K]
-  ) => void;
+  cocossd: () => Promise<cocossd.ObjectDetection>;
 };
 
 export const TensorflowContext = createContext<TensorflowContextValue>(
@@ -27,29 +16,50 @@ export const TensorflowContext = createContext<TensorflowContextValue>(
 );
 
 export default component<{ children: ReactNode }>(({ children }) => {
-  const [tfReady, setTfReady] = useState(false);
-  const [models, setModels] = useState<TensorflowContextValue["models"]>({});
-
-  const setModel = useCallback(
-    <K extends keyof TensorflowModels>(kind: K, model: TensorflowModels[K]) => {
-      setModels((prev) => ({
-        ...prev,
-        [kind]: model,
-      }));
-    },
-    [setModels]
-  );
-
-  useEffect(() => {
-    if (tfReady) return;
-    (async () => {
+  const { isSuccess: tfReady } = useQuery({
+    queryKey: ["tensorflow", "initial"],
+    queryFn: async () => {
       await tf.ready();
-      setTfReady(true);
-    })();
-  }, [tfReady, setTfReady, setModels]);
+      return {};
+    },
+    retry: false,
+    retryOnMount: false,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const { data: cocossdModel, refetch: loadModel } = useQuery({
+    queryKey: ["tensorflow", "cocossd"],
+    queryFn: async () => {
+      const model = await cocossd.load();
+      return model;
+    },
+    enabled: false,
+    retry: false,
+    retryOnMount: false,
+    staleTime: Infinity,
+    cacheTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
 
   return (
-    <TensorflowContext.Provider value={{ tfReady, models, setModel }}>
+    <TensorflowContext.Provider
+      value={{
+        tfReady,
+        cocossd: async () => {
+          if (cocossdModel) {
+            return cocossdModel;
+          }
+          const res = await loadModel();
+          if (res.isError) throw res.error;
+          return res.data!;
+        },
+      }}
+    >
       {children}
     </TensorflowContext.Provider>
   );

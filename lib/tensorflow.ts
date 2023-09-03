@@ -1,4 +1,3 @@
-import * as od from "@tensorflow-models/coco-ssd";
 import * as tf from "@tensorflow/tfjs";
 import { useCallback, useContext } from "react";
 import { TensorflowContext } from "./context/tensorflow-provider";
@@ -15,23 +14,23 @@ export function useTensorflow() {
 }
 
 export function useCocoSsd() {
-  const {
-    tfReady,
-    models: { cocossd },
-    setModel,
-  } = useContext(TensorflowContext);
+  const { tfReady, cocossd } = useContext(TensorflowContext);
 
   const detect = useCallback(
-    async (...args: Parameters<NonNullable<typeof cocossd>["detect"]>) => {
-      console.log("Loading coco-ssd model (from cache or creating new)...");
-      const model = cocossd ?? (await od.load());
-      console.log("Loaded coco-ssd model.");
-      if (!cocossd) {
-        setModel("cocossd", model);
-      }
-      return model.detect(...args);
+    async (
+      img:
+        | tf.Tensor3D
+        | ImageData
+        | HTMLImageElement
+        | HTMLCanvasElement
+        | HTMLVideoElement,
+      maxNumBoxes?: number,
+      minScore?: number
+    ) => {
+      const model = await cocossd();
+      return model.detect(img, maxNumBoxes, minScore);
     },
-    [cocossd, setModel]
+    [cocossd]
   );
 
   const dispose = useCallback(
@@ -39,5 +38,5 @@ export function useCocoSsd() {
     []
   );
 
-  return { ready: tfReady, detect, dispose };
+  return { ready: tfReady && !!cocossd, detect, dispose };
 }
