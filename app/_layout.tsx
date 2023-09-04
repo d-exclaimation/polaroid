@@ -1,5 +1,6 @@
 import TensorflowProvider from "@/lib/context/tensorflow-provider";
 import { component } from "@/lib/rc";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { ThemeProvider } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -26,20 +27,22 @@ export default component(() => {
             },
           }}
         >
-          <Stack initialRouteName="(tabs)">
-            <Stack.Screen
-              name="(tabs)"
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="captured"
-              options={{
-                presentation: "modal",
-              }}
-            />
-          </Stack>
+          <ActionSheetProvider>
+            <Stack initialRouteName="(tabs)">
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="captured"
+                options={{
+                  presentation: "modal",
+                }}
+              />
+            </Stack>
+          </ActionSheetProvider>
         </ThemeProvider>
       </TensorflowProvider>
     </QueryClientProvider>

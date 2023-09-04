@@ -31,19 +31,7 @@ export default component(() => {
           ),
         }}
       />
-      <Tabs.Screen
-        name="library"
-        options={{
-          title: "Library",
-          headerShown: false,
-          tabBarLabelStyle: {
-            display: "none",
-          },
-          tabBarIcon: (props) => (
-            <MaterialIcons name="library-books" size={24} color={props.color} />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="settings"
         options={{

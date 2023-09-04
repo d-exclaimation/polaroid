@@ -5,7 +5,8 @@ import { useCocoSsd } from "@/lib/tensorflow";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as cocossd from "@tensorflow-models/coco-ssd";
 import { decodeJpeg, fetch } from "@tensorflow/tfjs-react-native";
-import * as MediaLibrary from "expo-media-library";
+import * as Crypto from "expo-crypto";
+import * as FileSystem from "expo-file-system";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
@@ -15,8 +16,9 @@ const DIMENSIONS = {
   height: 350,
 };
 
+const SNAPS_DIRECTORY = `${FileSystem.documentDirectory}snaps`;
+
 export default component(() => {
-  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
   const { detect, dispose, ready } = useCocoSsd();
 
   const queryClient = useQueryClient();
@@ -39,26 +41,30 @@ export default component(() => {
   }, [params]);
 
   const { loading, start } = useLoading(true);
-  const [result, setResult] = useState<cocossd.DetectedObject[] | undefined>(
-    undefined
-  );
+  const [detections, setDetections] = useState<
+    cocossd.DetectedObject[] | undefined
+  >(undefined);
 
   const savePhoto = useCallback(async () => {
-    if (!photo) return;
+    if (!photo || loading || !detections) return;
 
-    if (!permissionResponse?.granted) {
-      const res = await requestPermission();
-      if (!res.granted) {
-        // TODO: Show error
-        return;
-      }
+    const id = Crypto.randomUUID();
+    const uri = `${SNAPS_DIRECTORY}/${id}.jpeg`;
+    const createdAt = new Date();
+    const { height, width } = photo;
+
+    const snapsDirectoryInfo = await FileSystem.getInfoAsync(uri);
+    if (!snapsDirectoryInfo.exists) {
+      await FileSystem.makeDirectoryAsync(uri, { intermediates: true });
     }
 
-    const { uri, height, width, creationTime } =
-      await MediaLibrary.createAssetAsync(photo.uri);
-    const createdAt = new Date(creationTime);
+    await FileSystem.copyAsync({
+      from: photo.uri,
+      to: `${SNAPS_DIRECTORY}/${id}.jpeg`,
+    });
+
     await mutateAsync({
-      id: createdAt.toISOString(),
+      id,
       photo: {
         uri,
         height,
@@ -66,8 +72,9 @@ export default component(() => {
       },
       kind: "regular",
       createdAt,
+      detections,
     });
-  }, [photo, mutateAsync, permissionResponse]);
+  }, [photo, loading, detections, mutateAsync]);
 
   const validate = useCallback(async () => {
     if (!ready || !photo) return;
@@ -76,10 +83,10 @@ export default component(() => {
     const imageBuffer = await imageAsset.arrayBuffer();
     const imageTensor = decodeJpeg(new Uint8Array(imageBuffer), 3);
     const detected = await detect(imageTensor);
-    setResult(detected);
+    setDetections(detected);
     dispose(imageTensor);
     console.log(`finished detection for ${photo.uri}`);
-  }, [setResult, ready, detect, dispose, photo]);
+  }, [setDetections, ready, detect, dispose, photo]);
 
   useEffect(() => {
     if (!ready || !photo) return;
@@ -119,8 +126,8 @@ export default component(() => {
             ) : (
               <View className="w-[350px] h-[350px] bg-black" />
             )}
-            {photo && result
-              ? result.map(
+            {photo && detections
+              ? detections.map(
                   ({ class: name, bbox: [x, y, width, height] }, i) => {
                     const color =
                       i % 3 === 0
@@ -174,7 +181,7 @@ export default component(() => {
           </Pressable>
           <Pressable
             className="px-4 py-1.5 rounded-md flex flex-row items-center justify-center bg-black/25 active:bg-black/50 ml-4"
-            disabled={!ready || !photo}
+            disabled={!ready || !photo || loading}
             onPress={savePhoto}
           >
             <Text className="text-blue-200 font-medium text-lg leading-7">

@@ -1,15 +1,18 @@
 import AssetImage from "@/lib/components/asset-image";
-import { getSnaps } from "@/lib/data/snaps";
+import SnapComponent from "@/lib/components/snap";
+import { clearAllSnaps, getSnaps } from "@/lib/data/snaps";
 import { component } from "@/lib/rc";
-import { useQuery } from "@tanstack/react-query";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAssets } from "expo-asset";
 import { Link } from "expo-router";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   Dimensions,
   FlatList,
-  Image,
+  Pressable,
   SafeAreaView,
   Text,
   View,
@@ -17,28 +20,47 @@ import {
 
 const { width: maxWidth } = Dimensions.get("window");
 
+const OPTIONS = ["Delete all", "Cancel"] as ["Delete all", "Cancel"];
+
 export default component(() => {
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["snaps"],
     queryFn: getSnaps,
   });
-  const [assets, assetError] = useAssets([
-    require("../../assets/snap-empty.png"),
-    require("../../assets/snap-regular.png"),
-    require("../../assets/snap-pic.png"),
-    require("../../assets/snap-fav.png"),
-    require("../../assets/snap-achieve.png"),
-  ]);
+  const { mutate } = useMutation({
+    mutationKey: ["snaps", "delete", "all"],
+    mutationFn: clearAllSnaps,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(["snaps"]);
+    },
+  });
+  const { showActionSheetWithOptions } = useActionSheet();
+  const [assets] = useAssets([require("../../assets/snap-empty.png")]);
 
   const emptyStateAsset = useMemo(() => assets?.[0], [assets]);
-  const regularAsset = useMemo(() => assets?.[1], [assets]);
-  const picAsset = useMemo(() => assets?.[2], [assets]);
-  const favAsset = useMemo(() => assets?.[3], [assets]);
-  const achieveAsset = useMemo(() => assets?.[4], [assets]);
 
-  if (assetError) {
-    console.log(assetError);
-  }
+  const onMore = useCallback(async () => {
+    const optionIndex =
+      (await new Promise<number | undefined>((resolve) =>
+        showActionSheetWithOptions(
+          {
+            title: "Options for your snaps",
+            options: OPTIONS,
+            cancelButtonIndex: OPTIONS.length - 1,
+            destructiveButtonIndex: 0,
+          },
+          resolve
+        )
+      )) ?? OPTIONS.length - 1;
+
+    switch (OPTIONS[optionIndex]) {
+      case "Delete all": {
+        mutate();
+        break;
+      }
+    }
+  }, []);
 
   // Loading state
   if (isLoading || !data) {
@@ -73,6 +95,13 @@ export default component(() => {
 
   return (
     <SafeAreaView className="flex-1 flex flex-col items-center justify-center">
+      <View className="py-3 w-full px-6 flex flex-row items-center justify-start bg-[#464C67] sticky top-0">
+        <Text className="text-white text-xl font-bold">Your Snaps</Text>
+
+        <Pressable className="ml-auto" onPress={onMore}>
+          <MaterialIcons name="more-vert" size={24} color="white" />
+        </Pressable>
+      </View>
       <FlatList
         data={data}
         keyExtractor={({ id }) => id}
@@ -80,38 +109,8 @@ export default component(() => {
           width: maxWidth,
           alignItems: "center",
         }}
-        renderItem={({ item: { photo, kind, createdAt } }) => {
-          return (
-            <View className="p-3">
-              <View className="w-[375px] h-[375px] relative overflow-hidden rounded-2xl">
-                <Image
-                  className="w-[375px] h-[375px] bg-black"
-                  source={photo}
-                />
-              </View>
-
-              <View className="flex flex-row my-4 px-1 items-center justify-start">
-                <AssetImage
-                  className="h-[32px] w-[32px]"
-                  asset={
-                    kind === "regular"
-                      ? regularAsset
-                      : kind === "pic"
-                      ? picAsset
-                      : kind === "fav"
-                      ? favAsset
-                      : achieveAsset
-                  }
-                />
-                <Text className="capitalize mx-3 font-bold text-neutral-100">
-                  {kind}
-                </Text>
-                <Text className="text-neutral-200 ml-auto">
-                  {createdAt.toLocaleString("en-NZ")}
-                </Text>
-              </View>
-            </View>
-          );
+        renderItem={({ item }) => {
+          return <SnapComponent {...item} />;
         }}
       />
     </SafeAreaView>
